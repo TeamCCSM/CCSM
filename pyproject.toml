@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ccsm"
+authors = [
+    {name = "CJ", email = "cjendantix@proton.me"},
+]
+version = "0.0.1"
+description = "A Simple and Easy-to-Use Save Manager for Crab Champions"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "Unlicense"}
+classifiers = [
+    "Development Status :: 1 - Staging",
+    "Environment :: Console :: Curses",
+    "License :: OSI Approved :: The Unlicense (Unlicense)",
+    "Typing :: Typed",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    'ui-forge'
+]
