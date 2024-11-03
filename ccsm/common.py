@@ -19,6 +19,7 @@ class SteamTypes(StrEnum):
     Windows = "Windows"
     LinuxNative = "Native"
     LinuxFlatpak = "Flatpak"
+    Custom = "Custom"
 
     @staticmethod
     def get(platform: Platforms) -> Optional["SteamTypes"]:
