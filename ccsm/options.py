@@ -9,8 +9,7 @@ savegamepath = "compatdata/774801/pfx/drive_c/Users/steamuser/AppData/Local/Crab
 
 steam_paths = {
     common.SteamTypes.Windows: Path("C:/Program Files (x86)/Steam"),
-    common.SteamTypes.LinuxNative: Path.home()
-    / ".local/share/Steam",
+    common.SteamTypes.LinuxNative: Path.home() / ".local/share/Steam",
     common.SteamTypes.LinuxFlatpak: Path.home()
     / ".var/app/com.valvesoftware.Steam/data/Steam",
 }
@@ -20,6 +19,7 @@ class GetOptionsError(Enum):
     Platform = 1
     SteamType = 2
     CustomTypeNoPathOverride = 3
+    SavePath = 4
 
 
 @dataclass
@@ -27,13 +27,15 @@ class Options:
     platform: common.Platforms
     steam_type: common.SteamTypes
     steam_path: Path
+    save_path: Path
 
     @classmethod
     def get_defaults(
         cls: type[Self],
         platform_override: Optional[common.Platforms] = None,
         steam_type_override: Optional[common.SteamTypes] = None,
-        steam_path_override: Optional[Path] = None
+        steam_path_override: Optional[Path] = None,
+        save_path_override: Optional[Path] = None,
     ) -> Union[GetOptionsError, Self]:
         user_platform = None
         if platform_override is not None:
@@ -58,4 +60,20 @@ class Options:
             steam_path = steam_paths.get(steam_type)
             if steam_path is None:
                 return GetOptionsError.CustomTypeNoPathOverride
-        return cls(user_platform, steam_type, steam_path)
+
+        save_path = None
+        if save_path_override is not None:
+            save_path = save_path_override
+        else:
+            if user_platform == common.Platforms.Windows:
+                save_path = Path.home() / "AppData/Local/CrabChampions/Saved/SaveGames"
+            elif user_platform == common.Platforms.Linux:
+                save_path = (
+                    steam_path
+                    / "steamapps/compatdata/774801/pfx/drive_c/users/steamuser/AppData/Local/CrabChampions/Saved/SaveGames"
+                )
+
+            if save_path is None or not save_path.exists():
+                return GetOptionsError.SavePath
+
+        return cls(user_platform, steam_type, steam_path, save_path)

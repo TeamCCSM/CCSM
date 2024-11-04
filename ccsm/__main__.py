@@ -1,6 +1,5 @@
 import curses
 import pickle
-import os
 from pathlib import Path
 from . import first_run
 
@@ -12,7 +11,7 @@ def setup_term():
 
 
 def get_main_path() -> Path:
-    main = Path(os.getcwd()) / ".ccsm"
+    main = Path().cwd() / ".ccsm"
     if not main.exists():
         main.mkdir(parents=True)
     return main
@@ -32,7 +31,7 @@ def main(stdscr: curses.window):
         options_file.write_bytes(pickle.dumps(options))
     else:
         options = pickle.loads(options_file.read_bytes())
-        
+
     stdscr.addstr(0, 0, str(options))
     stdscr.getch()
 
