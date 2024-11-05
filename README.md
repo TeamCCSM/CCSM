@@ -17,3 +17,5 @@
   - Create a menu for converting presets to backups ❌
   - Create a menu for editing preset data ❌
     - Find a way to watermark edited saves to prevent cheating ❌
+
+For those interested in reading the code, the name "Neocrab" refers to the internal simplified save format.
