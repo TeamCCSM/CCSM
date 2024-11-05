@@ -23,7 +23,7 @@ def linux_steam_path_select(current_type: common.SteamTypes, start_y: int = 0) -
     return Path(
         ui_forge.editor_ui(
             editor_win,
-            str(options.steam_paths[current_type]),
+            str(common.steam_paths[current_type]),
             path_validator,
             header="Please input the path of steam, ending with the directory named 'Steam' (Will reset your input if the path is invalid/doesn't exist).",
         )
@@ -41,13 +41,13 @@ def save_path_select(start_y: int = 0) -> Path:
     )
 
 
-class Unhandlable:
+class UnhandlableError:
     pass
 
 
 def handle_get_options_error(
     options_instance: Union[options.Options, options.GetOptionsError]
-) -> Union[Unhandlable, Tuple[options.Options, bool, bool]]:
+) -> Union[UnhandlableError, Tuple[options.Options, bool, bool]]:
     steam_path_overwritten = False
     save_path_overwritten = False
 
@@ -58,14 +58,18 @@ def handle_get_options_error(
             case options.GetOptionsError.Platform:
                 header_win = curses.newwin(2, curses.COLS - 1)
                 header_win.addstr(0, 0, "Failed to retrieve platform")
-                header_win.addstr(1, 0, "Override?")
+                header_win.addstr(
+                    1, 0, "Override? (WILL BREAK THINGS IF YOU SELECT THE WRONG ONE)"
+                )
                 header_win.refresh()
                 yes_no_win = curses.newwin(2, 6, 2, 0)
                 override = ui_forge.selection_ui(yes_no_win, menus.yes_no)
                 if override:
+                    header_win.clear()
+                    header_win.refresh()
                     overrides["platform_override"] = platform_select()
                 else:
-                    return Unhandlable()
+                    return UnhandlableError()
 
             case options.GetOptionsError.SteamType:
                 header_win = curses.newwin(2, curses.COLS - 1)
@@ -75,16 +79,18 @@ def handle_get_options_error(
                 yes_no_win = curses.newwin(2, 6, 2, 0)
                 override = ui_forge.selection_ui(yes_no_win, menus.yes_no)
                 if override:
+                    header_win.clear()
+                    header_win.refresh()
                     overrides["steam_type_override"] = common.SteamTypes.Custom
                     overrides["steam_path_override"] = linux_steam_path_select(
                         common.SteamTypes.LinuxNative
                     )
                     steam_path_overwritten = True
                 else:
-                    return Unhandlable()
+                    return UnhandlableError()
 
             case options.GetOptionsError.CustomTypeNoPathOverride:
-                return Unhandlable()
+                return UnhandlableError()
 
             case options.GetOptionsError.SavePath:
                 header_win = curses.newwin(2, curses.COLS - 1)
@@ -96,10 +102,12 @@ def handle_get_options_error(
                 yes_no_win = curses.newwin(2, 6, 2, 0)
                 override = ui_forge.selection_ui(yes_no_win, menus.yes_no)
                 if override:
+                    header_win.clear()
+                    header_win.refresh()
                     overrides["save_path_override"] = save_path_select()
                     save_path_overwritten = True
                 else:
-                    return Unhandlable()
+                    return UnhandlableError()
 
         options_instance = options.Options.get_defaults(**overrides)
 
@@ -110,14 +118,14 @@ def handle_get_options_error(
     )
 
 
-def main() -> Union[options.Options, Unhandlable]:
+def main() -> Union[options.Options, UnhandlableError]:
     steam_path_overwritten = False
     save_path_overwritten = False
 
     options_instance = options.Options.get_defaults()
     options_instance_and_data = handle_get_options_error(options_instance)
-    if isinstance(options_instance_and_data, Unhandlable):
-        return Unhandlable()
+    if isinstance(options_instance_and_data, UnhandlableError):
+        return UnhandlableError()
     (
         options_instance,
         steam_path_overwritten,

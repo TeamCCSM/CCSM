@@ -5,15 +5,6 @@ from typing import Optional, Self, Union
 from dataclasses import dataclass
 from . import common
 
-savegamepath = "compatdata/774801/pfx/drive_c/Users/steamuser/AppData/Local/CrabChampions/Saved/SaveGames"
-
-steam_paths = {
-    common.SteamTypes.Windows: Path("C:/Program Files (x86)/Steam"),
-    common.SteamTypes.LinuxNative: Path.home() / ".local/share/Steam",
-    common.SteamTypes.LinuxFlatpak: Path.home()
-    / ".var/app/com.valvesoftware.Steam/data/Steam",
-}
-
 
 class GetOptionsError(Enum):
     Platform = 1
@@ -57,7 +48,7 @@ class Options:
         if steam_path_override is not None:
             steam_path = steam_path_override
         else:
-            steam_path = steam_paths.get(steam_type)
+            steam_path = common.steam_paths.get(steam_type)
             if steam_path is None:
                 return GetOptionsError.CustomTypeNoPathOverride
 

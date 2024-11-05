@@ -34,3 +34,12 @@ class SteamTypes(StrEnum):
             return SteamTypes.Windows
         elif platform == Platforms.Linux:
             return SteamTypes.get_linux_steam_type()
+
+
+steam_paths = {
+    SteamTypes.Windows: Path("C:/Program Files (x86)/Steam"),
+    SteamTypes.LinuxNative: Path.home() / ".local/share/Steam",
+    SteamTypes.LinuxFlatpak: Path.home()
+    / ".var/app/com.valvesoftware.Steam/data/Steam",
+    SteamTypes.Custom: None,
+}

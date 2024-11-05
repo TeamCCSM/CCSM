@@ -1,7 +1,9 @@
 import curses
 import pickle
+import json
 from pathlib import Path
-from . import first_run
+from . import argument_parser, sav_ops
+from .options import first_run
 
 
 def setup_term():
@@ -10,23 +12,23 @@ def setup_term():
     curses.curs_set(0)
 
 
-def get_main_path() -> Path:
-    main = Path().cwd() / ".ccsm"
+def get_main_path(main_path: Path) -> Path:
+    main = main_path / ".ccsm"
     if not main.exists():
         main.mkdir(parents=True)
     return main
 
 
-def main(stdscr: curses.window):
+def main(stdscr: curses.window, args: argument_parser.Args):
     setup_term()
 
-    main = get_main_path()
+    main = get_main_path(args.main_path)
     options_file = main / "options.ccsm"
 
     options = None
     if not options_file.exists():
         options = first_run.main()
-        if isinstance(options, first_run.Unhandlable):
+        if isinstance(options, first_run.UnhandlableError):
             return
         options_file.write_bytes(pickle.dumps(options))
     else:
@@ -35,6 +37,13 @@ def main(stdscr: curses.window):
     stdscr.addstr(0, 0, str(options))
     stdscr.getch()
 
+    sav = sav_ops.load_save(options.save_path / "SaveSlot.sav")
+
+    Path("./testing.json").write_text(
+        json.dumps(sav_ops.save_to_neocrab(sav), indent=2)
+    )
+
 
 if __name__ == "__main__":
-    curses.wrapper(main)
+    args = argument_parser.parse_args()
+    curses.wrapper(main, args)
