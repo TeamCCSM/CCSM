@@ -9,7 +9,7 @@
 - Settings Menu ❌
 - Preset system
   - Create a preset system, storing only minimal data from a save and creating a full save from said data ❌
-- Backups System ❌
+- Backups System
   - Create a menu for storing backups from the current save ❌
   - Create a menu for loading stored backups to the current save ❌
 - Preset system (again)
