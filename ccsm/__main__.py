@@ -38,12 +38,6 @@ def main(stdscr: curses.window, args: argument_parser.Args):
     stdscr.addstr(0, 0, str(options))
     stdscr.getch()
 
-    sav = sav_ops.load_save(options.save_path / "SaveSlot.sav")
-
-    Path("./testing_.json").write_text(
-        json.dumps(to_neocrab._to_neocrab(sav), indent=2)
-    )
-
 
 if __name__ == "__main__":
     args = argument_parser.parse_args()

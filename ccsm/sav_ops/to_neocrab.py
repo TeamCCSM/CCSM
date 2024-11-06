@@ -30,7 +30,7 @@ def _parse_ranked_weapons(ranked_weapons: List[Any]) -> Dict[str, Any]:
 
 
 def _parse_reward(reward: List[Dict[str, str]]):
-    type_data = _remove_colon_prefix(reward[0]["value"])[-4:]
+    type_data = _remove_colon_prefix(reward[0]["value"])
     name_data = reward[1]["value"]
     return {"Type": type_data, "Name": name_data}
 
@@ -80,11 +80,13 @@ def _convert_next_island(next_island: List[Dict[Any, Any]]) -> Dict[str, Any]:
                 new_next_island_dict[name] = value
     return new_next_island_dict
 
+
 def _parse_enhancements(enhancements: List[str]) -> List[str]:
     new_enhancements = []
     for enhancement in enhancements:
         new_enhancements.append(_remove_colon_prefix(enhancement))
     return new_enhancements
+
 
 def _convert_mods(mods: List[Dict[Any, Any]]) -> Dict[str, Any]:
     new_mods = {}
@@ -135,9 +137,7 @@ def _convert_auto_save(save: List[Dict[Any, Any]]) -> Dict[str, Any]:
                 if name == "Difficulty":
                     new_save_dict[name] = _remove_colon_prefix(str(value))
                 elif name == "CrabSkin":
-                    new_save_dict["Skin"] = _remove_path_prefix(str(value)).split("_")[
-                        1
-                    ]
+                    new_save_dict[name] = _remove_path_prefix(str(value)).split("_")[1]
                 elif name == "WeaponDA":
                     new_save_dict["SelectedWeapon"] = _remove_path_prefix(
                         str(value)
@@ -155,7 +155,7 @@ def _convert_auto_save(save: List[Dict[Any, Any]]) -> Dict[str, Any]:
     return new_save_dict
 
 
-def _to_neocrab(save: List[Dict[Any, Any]]) -> Dict[str, Any]:
+def to_neocrab(save: List[Dict[Any, Any]]) -> Dict[str, Any]:
     new_save_dict = {}
     for item in save:
         if name := item.get("name"):
@@ -174,14 +174,14 @@ def _to_neocrab(save: List[Dict[Any, Any]]) -> Dict[str, Any]:
                 ):
                     new_save_dict[name] = _parse_mods(value)
                 elif name == "AutoSave":
-                    new_save_dict["Save"] = _convert_auto_save(value)
+                    new_save_dict[name] = _convert_auto_save(value)
                 else:
                     new_save_dict[name] = _parse_general_list(value)
             else:
                 if name == "Difficulty":
                     new_save_dict[name] = _remove_colon_prefix(str(value))
                 elif name == "CrabSkin":
-                    new_save_dict["Skin"] = _remove_path_prefix(str(value))
+                    new_save_dict[name] = _remove_path_prefix(str(value))
                 elif name == "WeaponDA":
                     new_save_dict["SelectedWeapon"] = _remove_path_prefix(
                         str(value)
@@ -201,6 +201,3 @@ def _to_neocrab(save: List[Dict[Any, Any]]) -> Dict[str, Any]:
         if new_save_dict.get("Save"):
             new_save_dict["Save"]["Difficulty"] = "Normal"
     return new_save_dict
-
-def save_to_neocrab(save: List[Dict[Any, Any]]) -> Optional[Dict[str, Any]]:
-    return _to_neocrab(save).get("Save")

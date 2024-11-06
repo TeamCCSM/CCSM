@@ -1,26 +1,22 @@
-from typing import Dict, Any, List, Optional
 import copy
-from pathlib import Path
-from ccsm.sav_ops import loader
-from SavConverter import json_to_sav
-import json
+from typing import List, Dict, Any, Optional
 
-key_conversion = {
+_key_conversion = {
     "SelectedWeapon": "WeaponDA",
     "SelectedAbility": "AbilityDA",
     "SelectedMelee": "MeleeDA",
 }
 
 
-def find_index_from_name(base: List[Dict[Any, Any]], name: str) -> Optional[int]:
+def _find_index_from_name(base: List[Dict[Any, Any]], name: str) -> Optional[int]:
     for i, item in enumerate(base):
-        if name in key_conversion.keys():
-            name = key_conversion[name]
+        if name in _key_conversion.keys():
+            name = _key_conversion[name]
         if item.get("name") == name:
             return i
 
 
-def generate_gvas_ranked_weapons(
+def _generate_gvas_ranked_weapons(
     neocrab: Dict[str, Dict[str, str]]
 ) -> List[List[Dict[str, str]]]:
     gvas_ranked_weapons = []
@@ -64,7 +60,7 @@ def generate_gvas_ranked_weapons(
     return gvas_ranked_weapons
 
 
-def merge_challenges(neocrab: Dict[Any, Any], base: List[Any]):
+def _merge_challenges(neocrab: Dict[Any, Any], base: List[Any]):
     for challenge in base:
         if neocrab_data := neocrab.get(challenge[0]["value"][4:]):
             challenge[1]["value"] = neocrab_data["Description"]
@@ -92,7 +88,7 @@ def merge_challenges(neocrab: Dict[Any, Any], base: List[Any]):
             ] = f"/Game/Character/Crab/Texture/{directory}/MI_{name}.MI_{name}"
 
 
-def generate_unlocked_weapons(weapons: List[str]) -> List[str]:
+def _generate_unlocked_weapons(weapons: List[str]) -> List[str]:
     unlocked_weapons = []
     for weapon in weapons:
         unlocked_weapons.append(
@@ -101,7 +97,7 @@ def generate_unlocked_weapons(weapons: List[str]) -> List[str]:
     return unlocked_weapons
 
 
-def generate_unlocked_abilities(abilities: List[str]) -> List[str]:
+def _generate_unlocked_abilities(abilities: List[str]) -> List[str]:
     unlocked_abilities = []
     for ability in abilities:
         unlocked_abilities.append(
@@ -110,7 +106,7 @@ def generate_unlocked_abilities(abilities: List[str]) -> List[str]:
     return unlocked_abilities
 
 
-def generate_unlocked_melees(melees: List[str]) -> List[str]:
+def _generate_unlocked_melees(melees: List[str]) -> List[str]:
     unlocked_melees = []
     for weapon in melees:
         unlocked_melees.append(
@@ -119,7 +115,7 @@ def generate_unlocked_melees(melees: List[str]) -> List[str]:
     return unlocked_melees
 
 
-def generate_unlocked_weapon_mods(mods: Dict[str, str]) -> List[str]:
+def _generate_unlocked_weapon_mods(mods: Dict[str, str]) -> List[str]:
     unlocked_weapon_mods = []
     for mod, rarity in mods.items():
         unlocked_weapon_mods.append(
@@ -128,7 +124,7 @@ def generate_unlocked_weapon_mods(mods: Dict[str, str]) -> List[str]:
     return unlocked_weapon_mods
 
 
-def generate_unlocked_ability_mods(mods: Dict[str, str]) -> List[str]:
+def _generate_unlocked_ability_mods(mods: Dict[str, str]) -> List[str]:
     unlocked_ability_mods = []
     for mod, rarity in mods.items():
         unlocked_ability_mods.append(
@@ -137,7 +133,7 @@ def generate_unlocked_ability_mods(mods: Dict[str, str]) -> List[str]:
     return unlocked_ability_mods
 
 
-def generate_unlocked_melee_mods(mods: Dict[str, str]) -> List[str]:
+def _generate_unlocked_melee_mods(mods: Dict[str, str]) -> List[str]:
     unlocked_melee_mods = []
     for mod, rarity in mods.items():
         unlocked_melee_mods.append(
@@ -146,7 +142,7 @@ def generate_unlocked_melee_mods(mods: Dict[str, str]) -> List[str]:
     return unlocked_melee_mods
 
 
-def generate_unlocked_perks(perks: Dict[str, str]) -> List[str]:
+def _generate_unlocked_perks(perks: Dict[str, str]) -> List[str]:
     unlocked_perks = []
     for mod, rarity in perks.items():
         unlocked_perks.append(
@@ -155,7 +151,7 @@ def generate_unlocked_perks(perks: Dict[str, str]) -> List[str]:
     return unlocked_perks
 
 
-def generate_unlocked_relics(relics: Dict[str, str]) -> List[str]:
+def _generate_unlocked_relics(relics: Dict[str, str]) -> List[str]:
     unlocked_relics = []
     for mod, rarity in relics.items():
         unlocked_relics.append(
@@ -164,14 +160,14 @@ def generate_unlocked_relics(relics: Dict[str, str]) -> List[str]:
     return unlocked_relics
 
 
-def merge_next_island_info(neocrab: Dict[str, Any], base: List[Dict[Any, Any]]):
+def _merge_next_island_info(neocrab: Dict[str, Any], base: List[Dict[Any, Any]]):
     base[0]["value"] = f"ECrabBiome::{neocrab["Biome"]}"
     base[1]["value"] = neocrab["CurrentIsland"]
     base[2]["value"] = neocrab["IslandName"]
     base[3]["value"] = f"ECrabIslandType::{neocrab["IslandType"]}"
 
 
-def generate_health_info(neocrab: Dict[str, Any]) -> List[Dict[Any, Any]]:
+def _generate_health_info(neocrab: Dict[str, Any]) -> List[Dict[Any, Any]]:
     return [
         {
             "type": "IntProperty",
@@ -212,14 +208,14 @@ def generate_health_info(neocrab: Dict[str, Any]) -> List[Dict[Any, Any]]:
     ]
 
 
-def parse_enhancements(neocrab: List[str]) -> List[str]:
+def _parse_enhancements(neocrab: List[str]) -> List[str]:
     enhancements = []
     for enhancement in neocrab:
         enhancements.append(f"ECrabEnhancementType::{enhancement}")
     return enhancements
 
 
-def generate_weapon_mods(
+def _generate_weapon_mods(
     neocrab: Dict[str, Dict[str, Any]], unlocked_weapon_mods: Dict[str, str]
 ) -> List[List[Dict[Any, Any]]]:
     weapon_mods = []
@@ -246,7 +242,7 @@ def generate_weapon_mods(
                             "type": "ArrayProperty",
                             "name": "Enhancements",
                             "subtype": "EnumProperty",
-                            "value": parse_enhancements(values["Enhancements"]),
+                            "value": _parse_enhancements(values["Enhancements"]),
                         },
                         {
                             "type": "FloatProperty",
@@ -262,7 +258,7 @@ def generate_weapon_mods(
     return weapon_mods
 
 
-def generate_ability_mods(
+def _generate_ability_mods(
     neocrab: Dict[str, Dict[str, Any]], unlocked_ability_mods: Dict[str, str]
 ) -> List[List[Dict[Any, Any]]]:
     ability_mods = []
@@ -289,7 +285,7 @@ def generate_ability_mods(
                             "type": "ArrayProperty",
                             "name": "Enhancements",
                             "subtype": "EnumProperty",
-                            "value": parse_enhancements(values["Enhancements"]),
+                            "value": _parse_enhancements(values["Enhancements"]),
                         },
                         {
                             "type": "FloatProperty",
@@ -305,7 +301,7 @@ def generate_ability_mods(
     return ability_mods
 
 
-def generate_melee_mods(
+def _generate_melee_mods(
     neocrab: Dict[str, Dict[str, Any]], unlocked_melee_mods: Dict[str, str]
 ) -> List[List[Dict[Any, Any]]]:
     melee_mods = []
@@ -332,7 +328,7 @@ def generate_melee_mods(
                             "type": "ArrayProperty",
                             "name": "Enhancements",
                             "subtype": "EnumProperty",
-                            "value": parse_enhancements(values["Enhancements"]),
+                            "value": _parse_enhancements(values["Enhancements"]),
                         },
                         {
                             "type": "FloatProperty",
@@ -348,7 +344,7 @@ def generate_melee_mods(
     return melee_mods
 
 
-def generate_perks(
+def _generate_perks(
     neocrab: Dict[str, Dict[str, Any]], unlocked_perks: Dict[str, str]
 ) -> List[List[Dict[Any, Any]]]:
     perks = []
@@ -375,7 +371,7 @@ def generate_perks(
                             "type": "ArrayProperty",
                             "name": "Enhancements",
                             "subtype": "EnumProperty",
-                            "value": parse_enhancements(values["Enhancements"]),
+                            "value": _parse_enhancements(values["Enhancements"]),
                         },
                         {
                             "type": "FloatProperty",
@@ -391,7 +387,7 @@ def generate_perks(
     return perks
 
 
-def generate_relics(
+def _generate_relics(
     neocrab: Dict[str, Dict[str, Any]], unlocked_relics: Dict[str, str]
 ) -> List[List[Dict[Any, Any]]]:
     relics = []
@@ -418,7 +414,7 @@ def generate_relics(
                             "type": "ArrayProperty",
                             "name": "Enhancements",
                             "subtype": "EnumProperty",
-                            "value": parse_enhancements(values["Enhancements"]),
+                            "value": _parse_enhancements(values["Enhancements"]),
                         },
                         {
                             "type": "FloatProperty",
@@ -434,51 +430,59 @@ def generate_relics(
     return relics
 
 
-def merge_autosave(
+def _merge_autosave(
     neocrab: Dict[str, Any],
     base: List[Dict[Any, Any]],
     unlocked_weapon_mods: Dict[str, str],
     unlocked_ability_mods: Dict[str, str],
     unlocked_melee_mods: Dict[str, str],
     unlocked_perks: Dict[str, str],
-    unlocked_relics: Dict[str, str]
+    unlocked_relics: Dict[str, str],
 ):
     for key, value in neocrab.items():
-        if index := find_index_from_name(base, key):
+        if index := _find_index_from_name(base, key):
             if key == "NextIslandInfo":
-                merge_next_island_info(value, base[index]["value"])
+                _merge_next_island_info(value, base[index]["value"])
             elif key == "HealthInfo":
-                base[index]["value"] = generate_health_info(value)
+                base[index]["value"] = _generate_health_info(value)
             elif key == "SelectedWeapon":
-                base[index]["value"] = f"/Game/Blueprint/Weapon/{value}/DA_Weapon_{value}.DA_Weapon_{value}"
+                base[index][
+                    "value"
+                ] = f"/Game/Blueprint/Weapon/{value}/DA_Weapon_{value}.DA_Weapon_{value}"
             elif key == "SelectedAbility":
-                base[index]["value"] = f"/Game/Blueprint/Ability/DA_Ability_{value}.DA_Ability_{value}"
+                base[index][
+                    "value"
+                ] = f"/Game/Blueprint/Ability/DA_Ability_{value}.DA_Ability_{value}"
             elif key == "SelectedMelee":
-                base[index]["value"] = f"/Game/Blueprint/Melee/DA_Melee_{value}.DA_Melee_{value}"
+                base[index][
+                    "value"
+                ] = f"/Game/Blueprint/Melee/DA_Melee_{value}.DA_Melee_{value}"
             elif key == "WeaponMods":
-                base[index]["value"] = generate_weapon_mods(value, unlocked_weapon_mods)
+                base[index]["value"] = _generate_weapon_mods(
+                    value, unlocked_weapon_mods
+                )
             elif key == "AbilityMods":
-                base[index]["value"] = generate_ability_mods(
+                base[index]["value"] = _generate_ability_mods(
                     value, unlocked_ability_mods
                 )
             elif key == "MeleeMods":
-                base[index]["value"] = generate_melee_mods(value, unlocked_melee_mods)
+                base[index]["value"] = _generate_melee_mods(value, unlocked_melee_mods)
             elif key == "Perks":
-                base[index]["value"] = generate_perks(value, unlocked_perks)
+                base[index]["value"] = _generate_perks(value, unlocked_perks)
             elif key == "Relics":
-                base[index]["value"] = generate_relics(value, unlocked_relics)
+                base[index]["value"] = _generate_relics(value, unlocked_relics)
             else:
                 base[index]["value"] = value
 
 
-def neocrab_to_save(
+def merge_neocrab(
     neocrab: Dict[str, Any], base: List[Dict[Any, Any]]
 ) -> List[Dict[Any, Any]]:
     base = copy.deepcopy(base)
     for key, value in neocrab.items():
-        if index := find_index_from_name(base, key):
+        if index := _find_index_from_name(base, key):
             if key == "RankedWeapons":
-                base[index]["value"] = generate_gvas_ranked_weapons(value)
+                base[index]["value"] = _generate_gvas_ranked_weapons(value)
             elif key == "CrabSkin":
                 base[index][
                     "value"
@@ -496,47 +500,33 @@ def neocrab_to_save(
                     "value"
                 ] = f"/Game/Blueprint/Melee/DA_Melee_{value}.DA_Melee_{value}"
             elif key == "Challenges":
-                merge_challenges(value, base[index]["value"])
+                _merge_challenges(value, base[index]["value"])
             elif key == "UnlockedWeapons":
-                base[index]["value"] = generate_unlocked_weapons(value)
+                base[index]["value"] = _generate_unlocked_weapons(value)
             elif key == "UnlockedAbilities":
-                base[index]["value"] = generate_unlocked_abilities(value)
+                base[index]["value"] = _generate_unlocked_abilities(value)
             elif key == "UnlockedMeleeWeapons":
-                base[index]["value"] = generate_unlocked_melees(value)
+                base[index]["value"] = _generate_unlocked_melees(value)
             elif key == "UnlockedWeaponMods":
-                base[index]["value"] = generate_unlocked_weapon_mods(value)
+                base[index]["value"] = _generate_unlocked_weapon_mods(value)
             elif key == "UnlockedAbilityMods":
-                base[index]["value"] = generate_unlocked_ability_mods(value)
+                base[index]["value"] = _generate_unlocked_ability_mods(value)
             elif key == "UnlockedMeleeMods":
-                base[index]["value"] = generate_unlocked_melee_mods(value)
+                base[index]["value"] = _generate_unlocked_melee_mods(value)
             elif key == "UnlockedPerks":
-                base[index]["value"] = generate_unlocked_perks(value)
+                base[index]["value"] = _generate_unlocked_perks(value)
             elif key == "UnlockedRelics":
-                base[index]["value"] = generate_unlocked_relics(value)
+                base[index]["value"] = _generate_unlocked_relics(value)
             elif key == "AutoSave":
-                merge_autosave(
+                _merge_autosave(
                     value,
                     base[index]["value"],
                     neocrab["UnlockedWeaponMods"],
                     neocrab["UnlockedAbilityMods"],
                     neocrab["UnlockedMeleeMods"],
                     neocrab["UnlockedPerks"],
-                    neocrab["UnlockedRelics"]
+                    neocrab["UnlockedRelics"],
                 )
             else:
                 base[index]["value"] = value
     return base
-
-
-sav_path = Path(
-    "/home/cj/.local/share/Steam/steamapps/compatdata/774801/pfx/drive_c/users/steamuser/AppData/Local/CrabChampions/Saved/SaveGames/SaveSlot.sav"
-)
-sav = loader.load(sav_path)
-Path("testing.json").write_text(json.dumps(sav, indent=2))
-base = json.loads(Path("./testing.json").read_text())
-neocrab = json.loads(Path("./testing_.json").read_text())
-
-gvas = neocrab_to_save(neocrab, base)
-
-Path("testing__.json").write_text(json.dumps(gvas, indent=2))
-sav_path.write_bytes(json_to_sav(gvas))
