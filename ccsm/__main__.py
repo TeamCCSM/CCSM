@@ -1,9 +1,7 @@
 import curses
 import pickle
-import json
 from pathlib import Path
-from . import argument_parser, sav_ops
-from .sav_ops import to_neocrab
+from . import argument_parser
 from .options import first_run
 
 

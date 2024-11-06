@@ -1,13 +1,8 @@
-from typing import Any, Dict, List, Optional
-import copy
+from typing import Any, Dict, List
 
 
 def _remove_colon_prefix(string: str) -> str:
     return string.split("::")[1]
-
-
-def _remove_score_prefix(string: str) -> str:
-    return string.split("_")[1]
 
 
 def _remove_path_prefix(weapon_path: str) -> str:
