@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional
+import copy
 
 
 def _remove_colon_prefix(string: str) -> str:
@@ -54,6 +55,13 @@ def _parse_challenges(challenges: List[Any]) -> Dict[str, Any]:
     return new_challenges
 
 
+def _parse_mods(mods: List[str]) -> Dict[str, str]:
+    new_mods = {}
+    for mod in mods:
+        new_mods[_remove_path_prefix(mod).split("_")[1]] = mod.split("/")[5]
+    return new_mods
+
+
 def _parse_general_list(l: List[Any]) -> List[Any]:  # noqa: E741
     new_list = []
     for item in l:
@@ -72,6 +80,11 @@ def _convert_next_island(next_island: List[Dict[Any, Any]]) -> Dict[str, Any]:
                 new_next_island_dict[name] = value
     return new_next_island_dict
 
+def _parse_enhancements(enhancements: List[str]) -> List[str]:
+    new_enhancements = []
+    for enhancement in enhancements:
+        new_enhancements.append(_remove_colon_prefix(enhancement))
+    return new_enhancements
 
 def _convert_mods(mods: List[Dict[Any, Any]]) -> Dict[str, Any]:
     new_mods = {}
@@ -79,7 +92,7 @@ def _convert_mods(mods: List[Dict[Any, Any]]) -> Dict[str, Any]:
         name_data = _remove_path_prefix(mod[0]["value"]).split("_")[1]
         inventory_data = mod[1]["value"]
         level_data = inventory_data[0]["value"]
-        enhancements_data = inventory_data[1]["value"]
+        enhancements_data = _parse_enhancements(inventory_data[1]["value"])
         accumulated_buff_data = inventory_data[2]["value"]
         new_mods[name_data] = {
             "Level": level_data,
@@ -111,6 +124,7 @@ def _convert_auto_save(save: List[Dict[Any, Any]]) -> Dict[str, Any]:
                 elif (
                     name == "WeaponMods"
                     or name == "AbilityMods"
+                    or name == "MeleeMods"
                     or name == "Perks"
                     or name == "Relics"
                 ):
@@ -148,9 +162,17 @@ def _to_neocrab(save: List[Dict[Any, Any]]) -> Dict[str, Any]:
             value = item.get("value")
             if isinstance(value, list):
                 if name == "RankedWeapons":
-                    new_save_dict["Weapons"] = _parse_ranked_weapons(value)
+                    new_save_dict[name] = _parse_ranked_weapons(value)
                 elif name == "Challenges":
                     new_save_dict[name] = _parse_challenges(value)
+                elif (
+                    name == "UnlockedWeaponMods"
+                    or name == "UnlockedAbilityMods"
+                    or name == "UnlockedMeleeMods"
+                    or name == "UnlockedPerks"
+                    or name == "UnlockedRelics"
+                ):
+                    new_save_dict[name] = _parse_mods(value)
                 elif name == "AutoSave":
                     new_save_dict["Save"] = _convert_auto_save(value)
                 else:
@@ -179,7 +201,6 @@ def _to_neocrab(save: List[Dict[Any, Any]]) -> Dict[str, Any]:
         if new_save_dict.get("Save"):
             new_save_dict["Save"]["Difficulty"] = "Normal"
     return new_save_dict
-
 
 def save_to_neocrab(save: List[Dict[Any, Any]]) -> Optional[Dict[str, Any]]:
     return _to_neocrab(save).get("Save")

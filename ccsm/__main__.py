@@ -3,6 +3,7 @@ import pickle
 import json
 from pathlib import Path
 from . import argument_parser, sav_ops
+from .sav_ops import to_neocrab
 from .options import first_run
 
 
@@ -39,8 +40,8 @@ def main(stdscr: curses.window, args: argument_parser.Args):
 
     sav = sav_ops.load_save(options.save_path / "SaveSlot.sav")
 
-    Path("./testing.json").write_text(
-        json.dumps(sav_ops.save_to_neocrab(sav), indent=2)
+    Path("./testing_.json").write_text(
+        json.dumps(to_neocrab._to_neocrab(sav), indent=2)
     )
 
 
