@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any, Dict, List
-from SavConverter import read_sav
 from SavConverter.SavToJson import to_json_structure
+from SavConverter.SavReader import SavReader
 
 
 def sav_to_list(props) -> List[Dict[Any, Any]]:
@@ -12,4 +12,6 @@ def sav_to_list(props) -> List[Dict[Any, Any]]:
 
 
 def load(save_path: Path) -> List[Dict[Any, Any]]:
-    return sav_to_list(read_sav(str(save_path)))
+    sav_reader = SavReader(save_path.read_bytes())
+    properties = sav_reader.read_whole_buffer()
+    return sav_to_list(properties)

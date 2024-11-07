@@ -530,3 +530,21 @@ def merge_neocrab(
             else:
                 base[index]["value"] = value
     return base
+
+def merge_autosave(
+    neocrab: Dict[str, Any], base: List[Dict[Any, Any]]
+) -> List[Dict[Any, Any]]:
+    base = copy.deepcopy(base)
+    for key, value in neocrab.items():
+        if index := _find_index_from_name(base, key):
+            if key == "AutoSave":
+                _merge_autosave(
+                    value,
+                    base[index]["value"],
+                    neocrab["UnlockedWeaponMods"],
+                    neocrab["UnlockedAbilityMods"],
+                    neocrab["UnlockedMeleeMods"],
+                    neocrab["UnlockedPerks"],
+                    neocrab["UnlockedRelics"],
+                )
+    return base
