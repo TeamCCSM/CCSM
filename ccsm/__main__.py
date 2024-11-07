@@ -23,7 +23,7 @@ def main(stdscr: curses.window, args: argument_parser.Args):
 
     main = get_main_path(args.main_path)
     options_file = main / "options.ccsm"
-
+    
     options = None
     if not options_file.exists():
         options = first_run.main()
@@ -32,11 +32,11 @@ def main(stdscr: curses.window, args: argument_parser.Args):
         options_file.write_bytes(pickle.dumps(options))
     else:
         options = pickle.loads(options_file.read_bytes())
-
+        
     stdscr.addstr(0, 0, str(options))
     stdscr.getch()
 
-
 if __name__ == "__main__":
     args = argument_parser.parse_args()
+    print(args)
     curses.wrapper(main, args)

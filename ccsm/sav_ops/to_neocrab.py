@@ -86,6 +86,8 @@ def _parse_enhancements(enhancements: List[str]) -> List[str]:
 def _convert_mods(mods: List[Dict[Any, Any]]) -> Dict[str, Any]:
     new_mods = {}
     for mod in mods:
+        if mod[0]["value"] == "None":
+            continue
         name_data = _remove_path_prefix(mod[0]["value"]).split("_")[1]
         inventory_data = mod[1]["value"]
         level_data = inventory_data[0]["value"]

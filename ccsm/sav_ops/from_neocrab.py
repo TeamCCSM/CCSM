@@ -172,37 +172,37 @@ def _generate_health_info(neocrab: Dict[str, Any]) -> List[Dict[Any, Any]]:
         {
             "type": "IntProperty",
             "name": "CurrentArmorPlates",
-            "value": neocrab["CurrentArmorPlates"],
+            "value": neocrab.get("CurrentArmorPlates") or 0,
         },
         {
             "type": "FloatProperty",
             "name": "CurrentArmorPlateHealth",
-            "value": neocrab["CurrentArmorPlateHealth"],
+            "value": neocrab.get("CurrentArmorPlateHealth") or 0,
         },
         {
             "type": "FloatProperty",
             "name": "PreviousArmorPlateHealth",
-            "value": neocrab["PreviousArmorPlateHealth"],
+            "value": neocrab.get("PreviousArmorPlateHealth") or 0,
         },
         {
             "type": "FloatProperty",
             "name": "CurrentHealth",
-            "value": neocrab["CurrentHealth"],
+            "value": neocrab.get("CurrentHealth") or 0,
         },
         {
             "type": "FloatProperty",
             "name": "CurrentMaxHealth",
-            "value": neocrab["CurrentMaxHealth"],
+            "value": neocrab.get("CurrentMaxHealth") or 0,
         },
         {
             "type": "FloatProperty",
             "name": "PreviousHealth",
-            "value": neocrab["PreviousHealth"],
+            "value": neocrab.get("PreviousHealth") or 0,
         },
         {
             "type": "FloatProperty",
             "name": "PreviousMaxHealth",
-            "value": neocrab["PreviousMaxHealth"],
+            "value": neocrab.get("PreviousMaxHealth") or 0,
         },
         {"type": "NoneProperty"},
     ]
