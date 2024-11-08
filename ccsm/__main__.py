@@ -2,6 +2,7 @@ import curses
 import pickle
 import ui_forge
 import json
+import shutil
 from ui_forge import items
 from collections import OrderedDict
 from pathlib import Path
@@ -30,19 +31,22 @@ def save_current_save(options: Options, main_path: Path, window: curses.window):
     backup_path = main_path / "backups" / backup_path
     if not backup_path.exists():
         backup_path.mkdir(parents=True)
+        
+    save_path = options.save_path / "SaveSlot.sav"
 
     (backup_path / "backup.ccsmbase").write_bytes(
-        pickle.dumps(sav_ops.load(options.save_path / "SaveSlot.sav"))
+        pickle.dumps(sav_ops.load(save_path))
     )
 
-    current_save = sav_ops.load(options.save_path / "SaveSlot.sav")
+    current_save = sav_ops.load(save_path)
     current_save = sav_ops.to_neocrab(current_save)
-
+    
+    shutil.copy(str(save_path), str(backup_path / "backup.sav"))
     (backup_path / "backup.neocrab").write_text(json.dumps(current_save, indent=2))
 
 
 def generate_backup_list(main_path: Path) -> OrderedDict[str, items.OptionItem]:
-    backup_selection = {}
+    backup_selection = {"Exit": items.OptionItem(value=None)}
     backups_path = main_path / "backups"
     for backup_path in backups_path.iterdir():
         backup_selection[backup_path.name] = items.OptionItem(value=backup_path)
@@ -64,12 +68,18 @@ def load_backup(options: Options, main_path: Path, window: curses.window):
 
     selection_neocrab = json.loads((selection_path / "backup.neocrab").read_text())
     merged_save = sav_ops.merge_neocrab(selection_neocrab, base)
-    
-    Path('./test_.json').write_text(json.dumps(selection_neocrab, indent=2))
-    Path('./test.json').write_text(json.dumps(merged_save, indent=2))
 
     save_path.write_bytes(sav_ops.dump(merged_save))
+    
+def delete_backup(options: Options, main_path: Path, window: curses.window):
+    selection_win = curses.newwin(*window.getmaxyx(), *window.getbegyx())
+    selection_path = ui_forge.selection_ui(
+        selection_win, options=generate_backup_list(main_path)
+    )
+    if not isinstance(selection_path, Path):
+        return
 
+    shutil.rmtree(str(selection_path))
 
 def main(stdscr: curses.window, args: argument_parser.Args):
     setup_term()
@@ -98,6 +108,9 @@ def main(stdscr: curses.window, args: argument_parser.Args):
                 "Load Backup": items.RunFunctionItem(
                     function=load_backup, args=(options, main, win)
                 ),
+                "Delete Backup": items.RunFunctionItem(
+                    function=delete_backup, args=(options, main, win)
+                )
             }
         ),
     )
